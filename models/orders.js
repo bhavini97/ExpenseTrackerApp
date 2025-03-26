@@ -7,10 +7,10 @@ const Order = sequelize.define("Order", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   order_id: { type: DataTypes.STRING, allowNull: false, unique: true },
   user_id: { type: DataTypes.INTEGER, allowNull: false },
-  amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+  amount: { type: DataTypes.INTEGER, allowNull: false },
   status: { 
-    type: DataTypes.ENUM("pending", "successful", "failed"), 
-    defaultValue: "pending" 
+    type: DataTypes.ENUM("PENDING", "SUCCESS", "FAILURE"), 
+    defaultValue: "PENDING" 
   }
 }, {
   timestamps: true,

@@ -14,35 +14,43 @@ exports.createOrder = async(
     customerPhone
 )=>{
     try{
-        const expiryDate = new Date(Date.now + 60*60*1000) //1 hr from now
+        const userId = String(customerId);
+        console.log('inside service')
+        const expiryDate = new Date(Date.now() + 60*60*1000) //1 hr from now
         const formattedExpiryDate =expiryDate.toISOString();
+        console.log('creating request')
         const request = {
-            "order_amount": orderAmount,
+            "order_amount": Number(orderAmount),
             "order_currency": order_currency,
             "order_id": orderId,
             "customer_details": {
-                "customer_id": customerId,
+                "customer_id": userId,
                 "customer_phone": customerPhone
             },
             "order_meta": {
-        "return_url": "http://localhost:3000/payment-status/{order_id}",
+        "return_url": `http://localhost:3000/payment/payment-status/${orderId}`,
         "payment_methods": "cc,dc,upi"
         },
             "order_expiry_time": formattedExpiryDate
         };
-    const response = await Cashfree.PGCreateOrder("2025-01-01",request);
+        
+
+        const response = await Cashfree.PGCreateOrder("2025-01-01", request);
+    
     return response.data.payment_session_id // this session id is important we will have to send it in frontend
     
    
 }catch(err){
-  console.error('error creating order', err.message)
+    console.error('Error creating order:', err.response ? err.response.data : err.message);
 }
 };
 
 exports.getPaymentStatus = async(orderId)=>{
 
 try{
-    const response = await Cashfree.PGOrderFetchPayment("2025-01-01",orderId);
+    console.log(orderId)
+    const response = await Cashfree.PGOrderFetchPayments("2025-01-01",orderId);
+
     let getOrderResponse = response.data;
     let order_status;
 
@@ -60,6 +68,6 @@ try{
     return order_status
 
 }catch(err){
-    console.error('error fetching order stauts',err.message)
+    console.error('error fetching order status',err.message)
 }
 }

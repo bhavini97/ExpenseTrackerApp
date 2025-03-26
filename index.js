@@ -16,7 +16,7 @@ app.use('/expense',expRouter);
 
 app.use('/auth',loginSignUpRoutes);
 
-app.use('/',orderRouter);
+app.use('/payment',orderRouter);
 
 
 

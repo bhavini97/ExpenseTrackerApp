@@ -79,3 +79,35 @@ function deleteElement(id,token){
    alert(`failed to delete`)
   })
 }
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+      const response = await fetch("http://localhost:3000/auth/user-details", {
+          headers: { "Authorization": `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+
+      if (data.isPremium) {
+          document.getElementById("leaderboardBtn").style.display = "block";
+      }
+  }
+
+});
+document.getElementById("leaderboardBtn").addEventListener("click", async () => {
+  const response = await fetch("http://localhost:3000/expense/leaderboard", {
+      headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
+  });
+
+  const data = await response.json();
+  const leaderboardList = document.getElementById("leaderboardList");
+  leaderboardList.innerHTML = ""; // Clear previous results
+
+  data.leaderboard.forEach(user => {
+      const li = document.createElement("li");
+      li.textContent = `${user.name}: ₹${user.total_expense}`;
+      leaderboardList.appendChild(li);
+  });
+});
+

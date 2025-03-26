@@ -1,4 +1,4 @@
-const { Expense } = require("../models/centralized");
+const { User,Expense } = require("../models/centralized");
 
 module.exports = {
   postExpense: async (req, res) => {
@@ -64,4 +64,26 @@ module.exports = {
       res.status(500).json({ message: "Error deleting expense", error });
     }
   },
+  getLeaderboard : async (req, res) => {
+    try {
+        const user = await User.findByPk(req.userId); // Get logged-in user
+
+        if (!user || !user.isPremium) { // Ensure only premium users can access
+            return res.status(403).json({ message: "Access denied. Premium users only." });
+        }
+
+        // Get total expense per user
+        const leaderboard = await User.findAll({
+            attributes: ['id', 'name', [Expense.sequelize.fn('SUM', Expense.sequelize.col('amount')), 'total_expense']],
+            include: [{ model: Expense, attributes: [] }],
+            group: ['User.id'],
+            order: [[Expense.sequelize.fn('SUM', Expense.sequelize.col('amount')), 'DESC']]
+        });
+
+        res.status(200).json({ leaderboard });
+    } catch (err) {
+        console.error("Error fetching leaderboard:", err);
+        res.status(500).json({ message: "Error fetching leaderboard" });
+    }
+  }
 };
