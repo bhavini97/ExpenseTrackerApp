@@ -1,6 +1,7 @@
 const db = require('./db');
 const User = require('./users');
 const Expense = require('./expense');
+const Order = require('./orders');
 const syncDB = async()=>{
     try{
         await db.authenticate();
@@ -17,4 +18,4 @@ const syncDB = async()=>{
         console.error('Error syncing database:', err);
     }
 } 
-module.exports = {User,Expense,syncDB};
+module.exports = {User,Expense,Order,syncDB};

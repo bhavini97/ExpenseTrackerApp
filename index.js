@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const loginSignUpRoutes = require('./routes/loginSignUp');
 const expRouter = require('./routes/expenseRoutes');
+const orderRouter = require('./routes/orderRoutes');
 const {syncDB} = require('./models/centralized');
 
 app.use(cors());
@@ -14,6 +15,8 @@ app.use(express.static('public'));
 app.use('/expense',expRouter);
 
 app.use('/auth',loginSignUpRoutes);
+
+app.use('/',orderRouter);
 
 
 
