@@ -98,9 +98,7 @@ function deleteElement(id, token) {
 }
 
 // to show leaderboard
-document
-  .getElementById("leaderboardBtn")
-  .addEventListener("click", async () => {
+document.getElementById("leaderboardBtn").addEventListener("click", async () => {
     try {
       const response = await fetch(
         "http://localhost:3000/premium/leaderboard",

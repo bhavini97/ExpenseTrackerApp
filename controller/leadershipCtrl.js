@@ -27,7 +27,7 @@ module.exports = {
         attributes: ["id", "username", "totalExpense"],
         order: [["totalExpense", "DESC"]],
       });
-      console.log(leaderboard);
+     
 
       res.status(200).json({ leaderboard });
     } catch (err) {

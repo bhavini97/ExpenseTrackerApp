@@ -23,9 +23,7 @@ module.exports = {
       });
 
       if (!result) {
-        return res
-          .status(400)
-          .json({ message: "error while adding expense", err });
+        return res.status(400).json({ message: "error while adding expense", err });
       }
 
       const addExpenseToUser = await User.increment("totalExpense", {
@@ -34,14 +32,14 @@ module.exports = {
           id: userId,
         },
       });
+        console.log('in post expense',addExpenseToUser)
 
-      return res
-        .status(200)
-        .json({
-          message: "expense added successfully",
-          result,
-          addExpenseToUser,
+        const updatedUser = await User.findOne({
+          where: { id: userId },
+          attributes: ["id", "totalExpense"],
         });
+        console.log('updates expense',updatedUser.totalExpense)
+      return res.status(200).json({  message: "expense added successfully",result,totalExpense: updatedUser.totalExpense});
     } catch (err) {
       console.error("something went wrong when adding expense", err);
       return res
@@ -71,19 +69,21 @@ module.exports = {
 
   deleteExp: async (req, res) => {
     const id = req.params.id;
-
+    
     try {
       const expense = await Expense.findByPk(id);
         if (!expense) {
             return res.status(404).json({ message: "Expense not found" });
         }
+       // console.log(expense);
+
       const deletedRows = await Expense.destroy({ where: { id: id } });
       if (deletedRows > 0) {
-        res.status(200).json({ message: "Expense deleted successfully" });
         await User.update(
-          { total_expense: Sequelize.literal(`totalExpense - ${expense.amount}`) },
-          { where: { id: req.user.userId } }
-      );
+          { totalExpense: db.literal(`totalExpense - ${expense.amount}`) },
+          { where: { id: expense.userId } }
+        );
+        return res.status(200).json({ message: "Expense deleted successfully" });
 
       } else {
         res.status(404).json({ message: "Expense not found" });
