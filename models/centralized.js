@@ -18,4 +18,4 @@ const syncDB = async()=>{
         console.error('Error syncing database:', err);
     }
 } 
-module.exports = {User,Expense,Order,syncDB};
+module.exports = {User,Expense,Order,db,syncDB};

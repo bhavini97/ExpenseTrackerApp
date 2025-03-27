@@ -26,6 +26,7 @@ document.getElementById("renderBtn").addEventListener("click", async() => {
     console.log('in cashfreeWeb_self')
        const data = await response.json()
        const paymentSessionId = data.paymentSessionId;
+       const orderId = data.orderId
 
        //initaiate checkout options
        let checkoutOptions = {
@@ -36,7 +37,11 @@ document.getElementById("renderBtn").addEventListener("click", async() => {
        }
 
        //start the checkout process
-       await cashfree.checkout(checkoutOptions);
+       setTimeout(async () => {
+       
+          await cashfree.checkout(checkoutOptions);
+        
+    }, 500);
 
        const res = await fetch(`http://localhost:3000/payment/payment-status/${orderId}`,{
         method :"GET",

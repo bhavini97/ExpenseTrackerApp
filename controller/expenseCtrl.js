@@ -1,4 +1,4 @@
-const { User,Expense } = require("../models/centralized");
+const { User,Expense,db } = require("../models/centralized");
 
 module.exports = {
   postExpense: async (req, res) => {
@@ -66,19 +66,24 @@ module.exports = {
   },
   getLeaderboard : async (req, res) => {
     try {
-        const user = await User.findByPk(req.userId); // Get logged-in user
+        const user = await User.findByPk(req.user.userId); // Get logged-in user
 
         if (!user || !user.isPremium) { // Ensure only premium users can access
             return res.status(403).json({ message: "Access denied. Premium users only." });
         }
 
         // Get total expense per user
-        const leaderboard = await User.findAll({
-            attributes: ['id', 'name', [Expense.sequelize.fn('SUM', Expense.sequelize.col('amount')), 'total_expense']],
-            include: [{ model: Expense, attributes: [] }],
-            group: ['User.id'],
-            order: [[Expense.sequelize.fn('SUM', Expense.sequelize.col('amount')), 'DESC']]
-        });
+        const leaderboard = await db.query(
+          `SELECT users.id, users.username, 
+          COALESCE(SUM(expense.amount), 0) AS total_expense 
+   FROM users 
+   LEFT JOIN expense ON users.id = expense.userId 
+   
+   GROUP BY users.id 
+   ORDER BY total_expense DESC;`
+        )
+        // COALESCE(SUM(expense.amount), 0)  to ensure the userid with no expense appears as 0
+        console.log(leaderboard)
 
         res.status(200).json({ leaderboard });
     } catch (err) {

@@ -72,5 +72,21 @@ module.exports ={
             console.error(" Error logging in:", error);
             return res.status(500).json({ message: "Internal Server Error" });
         }
+    },
+
+    getUserDetails : async(req,res)=>{
+        
+        if(!req.user.userId){
+            return res.status(400).json({message : 'User id not found in req header(in getUserDetail)'})
+        }
+
+        try{
+            const result = await User.findByPk(req.user.userId);
+            
+        console.log("User Details Fetched:", result)
+            return res.status(200).json({ message: "User dtails",isPremium: result.isPremium });
+        }catch(err){
+            return res.status(500).json({ message: "Error getting detail of user",err });
+        }
     }
 };

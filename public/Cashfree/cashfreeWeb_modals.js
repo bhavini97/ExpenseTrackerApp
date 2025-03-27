@@ -4,8 +4,8 @@ window.onload = function () {
         mode: "sandbox",
     });
 };
-document.getElementById("renderBtn").addEventListener("click", async() => {
-
+document.getElementById("renderBtn").addEventListener("click", async(event) => {
+    event.preventDefault();
     const amount = document.getElementById("amount").value;
     const phone = document.getElementById("phone").value;
     const token = localStorage.getItem("token");  // Get JWT token
@@ -37,9 +37,17 @@ document.getElementById("renderBtn").addEventListener("click", async() => {
         redirectTarget : "_modal" //default
        }
 
-       //start the checkout process
-       const result = await cashfree.checkout(checkoutOptions);
-
+       // start checkout process
+       const result = await new Promise(resolve => {
+        setTimeout(async () => {
+            try {
+                const checkoutResult = await cashfree.checkout(checkoutOptions);
+                resolve(checkoutResult);
+            } catch (error) {
+                reject(error); // If checkout fails, handle it properly
+            }
+        }, 500);
+    });
        if(result.error){
         console.error(result.error)
        }

@@ -1,10 +1,22 @@
-
 const ul = document.querySelector("#expList");
-document.addEventListener("DOMContentLoaded", () => {
+const token = localStorage.getItem("token");
+document.addEventListener("DOMContentLoaded", async() => {
+
+  if (token) {
+      const response = await fetch("http://localhost:3000/auth/user-details", {
+          headers: { "Authorization": `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+        console.log(data)
+      if (data.isPremium) {
+          document.getElementById("leaderboardBtn").style.display = "block";
+      }
+  }
   fetchDetails();
 });
 function fetchDetails() {
-  const token = localStorage.getItem("token");
+  
   axios
     .get(`http://localhost:3000/expense/get-expense`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -50,7 +62,7 @@ function postExpense(event) {
      category : event.target.type.value,
     description : event.target.desc.value
   }
-  const token = localStorage.getItem("token");
+  
   axios
     .post(`http://localhost:3000/expense/add-expense`, expenseData,
       {
@@ -79,34 +91,20 @@ function deleteElement(id,token){
    alert(`failed to delete`)
   })
 }
-document.addEventListener("DOMContentLoaded", async () => {
-  const token = localStorage.getItem("token");
 
-  if (token) {
-      const response = await fetch("http://localhost:3000/auth/user-details", {
-          headers: { "Authorization": `Bearer ${token}` },
-      });
-
-      const data = await response.json();
-
-      if (data.isPremium) {
-          document.getElementById("leaderboardBtn").style.display = "block";
-      }
-  }
-
-});
 document.getElementById("leaderboardBtn").addEventListener("click", async () => {
   const response = await fetch("http://localhost:3000/expense/leaderboard", {
       headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
   });
 
   const data = await response.json();
+  console.log(data)
   const leaderboardList = document.getElementById("leaderboardList");
   leaderboardList.innerHTML = ""; // Clear previous results
 
-  data.leaderboard.forEach(user => {
+  data.leaderboard[0].forEach(user => {
       const li = document.createElement("li");
-      li.textContent = `${user.name}: ₹${user.total_expense}`;
+      li.textContent = `${user.username}: ₹${user.total_expense}`;
       leaderboardList.appendChild(li);
   });
 });
