@@ -16,6 +16,6 @@ router.get('/login',(req,res)=>{
 
 router.post('/user/login',loginSignUpCtrl.loginUser);
 
-router.get('/user-details',authMiddleware,loginSignUpCtrl.getUserDetails);
+
 
 module.exports = router;

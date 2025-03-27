@@ -8,10 +8,8 @@ Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
 
 exports.createOrder = async(
     orderId,
-    orderAmount,
-    order_currency = "INR",
-    customerId,
-    customerPhone
+    customerId
+    
 )=>{
     try{
         const userId = String(customerId);
@@ -20,12 +18,12 @@ exports.createOrder = async(
         const formattedExpiryDate =expiryDate.toISOString();
         console.log('creating request')
         const request = {
-            "order_amount": Number(orderAmount),
-            "order_currency": order_currency,
+            "order_amount": 88,
+            "order_currency": "INR",
             "order_id": orderId,
             "customer_details": {
                 "customer_id": userId,
-                "customer_phone": customerPhone
+                "customer_phone": "8474090589"
             },
             "order_meta": {
         "return_url": `http://localhost:3000/payment/payment-status/${orderId}`,

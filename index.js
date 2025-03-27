@@ -5,6 +5,7 @@ const cors = require('cors');
 const loginSignUpRoutes = require('./routes/loginSignUp');
 const expRouter = require('./routes/expenseRoutes');
 const orderRouter = require('./routes/orderRoutes');
+const leaderboardRouter = require('./routes/leadershipRoutes')
 const {syncDB} = require('./models/centralized');
 
 app.use(cors());
@@ -17,6 +18,8 @@ app.use('/expense',expRouter);
 app.use('/auth',loginSignUpRoutes);
 
 app.use('/payment',orderRouter);
+
+app.use('/premium',leaderboardRouter);
 
 
 

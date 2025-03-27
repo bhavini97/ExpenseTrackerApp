@@ -5,11 +5,7 @@ const cashfreeService = require('../Service/cashfreeService');
 module.exports = {
     postPaymentOrder : async(req,res)=>{
         const userId = req.user.userId;
-        const {amount,phone} = req.body;
-
-        if (!amount || !phone) {
-            return res.status(400).json({ message: "Amount and phone are required" });
-        }
+        
 
         if(!userId){
             return res.status(401).json({ message: "User ID is required" });
@@ -18,13 +14,12 @@ module.exports = {
         const orderId = `ORDER_${Date.now()}`; // Generate unique order ID
 
         try{
-            const paymentSessionId = await cashfreeService.createOrder(orderId,amount,"INR",userId,phone);
+            const paymentSessionId = await cashfreeService.createOrder(orderId,userId);
             console.log(paymentSessionId)
 
             const result = await Order.create({
                 order_id: orderId,
             user_id: userId,
-            amount: amount,
             status: "pending",
             })
             res.status(200).json({ paymentSessionId, orderId });

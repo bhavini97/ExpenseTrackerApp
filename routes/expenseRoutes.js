@@ -11,6 +11,6 @@ router.get('/add-expense',(req,res)=>{
 router.post('/add-expense',authMiddleware,expCtrl.postExpense);
 router.get('/get-expense',authMiddleware,expCtrl.getExpense)
 router.delete('/delete/:id',authMiddleware,expCtrl.deleteExp);
-router.get('/leaderboard', authMiddleware, expCtrl.getLeaderboard);
+
 
 module.exports = router;

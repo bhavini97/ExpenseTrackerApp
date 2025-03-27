@@ -22,7 +22,15 @@ const User = sequelize.define(
     email:{
         type: DataTypes.STRING,
         allowNull: false,
-    },isPremium: { type: DataTypes.BOOLEAN, defaultValue: false },
+    },
+    isPremium: {
+       type: DataTypes.BOOLEAN, defaultValue: false 
+
+    },
+    totalExpense:{
+      type :DataTypes.INTEGER,
+      defaultValue: 0
+    }
   
   },
   {

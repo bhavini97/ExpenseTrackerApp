@@ -1,26 +1,32 @@
 const ul = document.querySelector("#expList");
 const token = localStorage.getItem("token");
-document.addEventListener("DOMContentLoaded", async() => {
-
-  if (token) {
-      const response = await fetch("http://localhost:3000/auth/user-details", {
-          headers: { "Authorization": `Bearer ${token}` },
-      });
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    if (token) {
+      const response = await fetch(
+        "http://localhost:3000/premium/auth/user-details",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       const data = await response.json();
-        console.log(data)
+      console.log(data);
       if (data.isPremium) {
-          document.getElementById("leaderboardBtn").style.display = "block";
+        document.getElementById("leaderboardBtn").style.display = "block";
       }
+
+      fetchDetails();
+    }
+  } catch (err) {
+    console.error("error getting user details for premium status");
   }
-  fetchDetails();
 });
 function fetchDetails() {
-  
   axios
     .get(`http://localhost:3000/expense/get-expense`, {
-      headers: { Authorization: `Bearer ${token}` }
-  })
+      headers: { Authorization: `Bearer ${token}` },
+    })
     .then((res) => {
       ul.innerHTML = ``;
       const data = res.data;
@@ -36,19 +42,19 @@ function fetchDetails() {
         delBtn.textContent = "Delete";
         delBtn.className = "btn btn-danger btn-sm ms-2";
         delBtn.addEventListener("click", () => {
-            deleteElement(element.id,token);
+          deleteElement(element.id, token);
         });
         li.append(delBtn);
         ul.append(li);
       });
     })
     .catch((err) => {
-      if(err.response){
-        if(err.response.status === 500){
-          console.log(err.response.data.message)
+      if (err.response) {
+        if (err.response.status === 500) {
+          console.log(err.response.data.message);
         }
-      }else{
-        console.log('Something went wrong')
+      } else {
+        console.log("Something went wrong");
       }
     });
 }
@@ -56,21 +62,18 @@ function postExpense(event) {
   event.preventDefault();
 
   //getting all input value
-  const expenseData ={
+  const expenseData = {
+    amount: event.target.amt.value,
+    category: event.target.type.value,
+    description: event.target.desc.value,
+  };
 
-     amount : event.target.amt.value,
-     category : event.target.type.value,
-    description : event.target.desc.value
-  }
-  
   axios
-    .post(`http://localhost:3000/expense/add-expense`, expenseData,
-      {
-        headers: { 
-                  Authorization: `Bearer ${token}`  // sending token to backend from localstorage
-                }
-        }
-    )
+    .post(`http://localhost:3000/expense/add-expense`, expenseData, {
+      headers: {
+        Authorization: `Bearer ${token}`, // sending token to backend from localstorage
+      },
+    })
     .then((res) => {
       document.querySelector("#expense").reset();
       fetchDetails();
@@ -80,32 +83,44 @@ function postExpense(event) {
     });
 }
 
-function deleteElement(id,token){
-  axios.delete(`http://localhost:3000/expense/delete/${id}`,{
-    headers: { Authorization: `Bearer ${token}` }
-  
-  }).then(res=>{
-     fetchDetails();
-  }).catch(err=>{
-    console.error(err);
-   alert(`failed to delete`)
-  })
+function deleteElement(id, token) {
+  axios
+    .delete(`http://localhost:3000/expense/delete/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((res) => {
+      fetchDetails();
+    })
+    .catch((err) => {
+      console.error(err);
+      alert(`failed to delete`);
+    });
 }
 
-document.getElementById("leaderboardBtn").addEventListener("click", async () => {
-  const response = await fetch("http://localhost:3000/expense/leaderboard", {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
+// to show leaderboard
+document
+  .getElementById("leaderboardBtn")
+  .addEventListener("click", async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/premium/leaderboard",
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      const data = await response.json();
+      console.log(data);
+      const leaderboardList = document.getElementById("leaderboardList");
+      leaderboardList.style.display = "block";
+      leaderboardList.innerHTML = ""; // Clear previous results
+
+      data.leaderboard.forEach((user) => {
+        const li = document.createElement("li");
+        li.textContent = `${user.username}: ₹${user.totalExpense}`;
+        leaderboardList.appendChild(li);
+      });
+    } catch (err) {
+      console.error("error getting leadership data");
+    }
   });
-
-  const data = await response.json();
-  console.log(data)
-  const leaderboardList = document.getElementById("leaderboardList");
-  leaderboardList.innerHTML = ""; // Clear previous results
-
-  data.leaderboard[0].forEach(user => {
-      const li = document.createElement("li");
-      li.textContent = `${user.username}: ₹${user.total_expense}`;
-      leaderboardList.appendChild(li);
-  });
-});
-

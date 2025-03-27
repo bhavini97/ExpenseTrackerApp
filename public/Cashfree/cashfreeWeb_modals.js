@@ -6,8 +6,7 @@ window.onload = function () {
 };
 document.getElementById("renderBtn").addEventListener("click", async(event) => {
     event.preventDefault();
-    const amount = document.getElementById("amount").value;
-    const phone = document.getElementById("phone").value;
+    
     const token = localStorage.getItem("token");  // Get JWT token
     
     if (!token) {
@@ -23,7 +22,6 @@ document.getElementById("renderBtn").addEventListener("click", async(event) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // Send token
         },
-        body: JSON.stringify({ amount, phone }), // Send amount & phone
        })
        const data = await response.json()
        const paymentSessionId = data.paymentSessionId;
@@ -65,6 +63,7 @@ document.getElementById("renderBtn").addEventListener("click", async(event) => {
         const data = await response.json()
         console.log(data)
         alert("your payment is "+data.orderStatus)
+        window.location.href = "http://localhost:3000/expense/add-expense";
        }
     }catch(err){
       console.log('error ',err.message)

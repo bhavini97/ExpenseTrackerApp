@@ -11,6 +11,7 @@ function postForm(event){
      })
      .then(res=>{
         alert(res.data.message);
+        document.querySelector("#signup").reset();
         console.log(`respond send successfully`)
      }).catch(err=>{
       if (err.response) {
@@ -39,6 +40,7 @@ function getForm(event){
         localStorage.setItem("token", response.data.token); // TOKEN IS STORED HERE
          } 
     alert("Login successful!");
+    document.querySelector("#login").reset();
       window.location.href = "/expense/add-expense";
      
      }). catch (error=> {
