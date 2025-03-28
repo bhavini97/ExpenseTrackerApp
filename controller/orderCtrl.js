@@ -1,5 +1,5 @@
-const {Order} = require('../models/centralized');
-const {User} = require('../models/centralized');
+const {Order,User,db} = require('../models/centralized');
+
 const cashfreeService = require('../Service/cashfreeService');
 
 module.exports = {
@@ -38,8 +38,8 @@ module.exports = {
             return res.status(400).json({ message: "Order Id not received" });
         }
 
+        const t = await db.transaction()
         try{
-          
             const order_status = await cashfreeService.getPaymentStatus(orderId);
             console.log(order_status)
             if(!order_status){
@@ -53,11 +53,17 @@ module.exports = {
                     return res.status(404).json({ message: "Order not found" });
                 }
                 if (order_status === "SUCCESS") {
-                    await User.update({ isPremium: true }, { where: { id: order.user_id } });
+                    await User.update({ isPremium: true }, { where: { id: order.user_id } },{
+                        transaction : t
+                    });
+
                     console.log(`User ${order.user_id} is now premium`);
                 }
-                const [result] = await Order.update({status:order_status},{where:{order_id:orderId}});
-
+                const [result] = await Order.update({status:order_status},{where:{order_id:orderId}},{
+                    transaction : t
+                });
+                 
+                await t.commit();
                 if(result >0){
                     console.log('order status updated successfully')
                 }else{
@@ -67,11 +73,12 @@ module.exports = {
             }else{
                 return res.status(300).json({ message: "Payment status still pending" ,orderStatus: order_status });
             }
-
+ 
                 return res.status(200).json({ message: "Payment Successful" ,orderStatus: order_status });
             
 
         }}catch(err){
+            await t.rollback();
             console.error("Error in payment-status/:orderId API:", err);
             res.status(500).json({ message: "Error getting payment status", error: err.message });
         }
