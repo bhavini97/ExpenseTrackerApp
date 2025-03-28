@@ -59,3 +59,28 @@ function getForm(event){
  })
      
 };
+document.getElementById("forgotPasswordLink").addEventListener("click", function(event) {
+    event.preventDefault();
+    document.getElementById("forgotContainer").style.display = "block";
+});
+function submitForgotPassword(){
+    const email = document.getElementById("email1").value;
+    const messageBox = document.getElementById("responseMessage");
+
+    if (!email) {
+        messageBox.style.color = "red";
+        messageBox.innerText = "Please enter your email!";
+        return;
+    }
+
+    axios.post("http://localhost:3000/password/forgotpassword", { email })
+        .then(response => {
+            messageBox.style.color = "green";
+            messageBox.innerText = response.data.message || "Email sent! Check your inbox.";
+        })
+        .catch(error => {
+            messageBox.style.color = "red";
+            messageBox.innerText = error.response?.data?.message || "Something went wrong!";
+        });
+
+}

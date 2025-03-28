@@ -1,6 +1,6 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const {User} = require('../models/centralized');
+const {User,db} = require('../models/centralized');
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = process.env.JWT_SECRET_KEY 
 
@@ -13,7 +13,7 @@ module.exports ={
        if (!username || !email || !password) {
         return res.status(400).json({ message: "All fields required" });
     }
-
+       const t = await db.transaction();
        try{
         const hashedPassword = await bcrypt.hash(password, 10).catch(err => {
             console.error('Error hashing password:', err);
@@ -23,16 +23,19 @@ module.exports ={
         const [result, created] = await User.findOrCreate({ 
             where: { email: email },
             defaults:{username: username,password:hashedPassword,email:email }
+       },{
+        transaction :t
        });
 
         if(!created){
             return  res.status(400).json({ message: 'User already exists with the same email' });
         }
 
-        
+        await t.commit();
         return res.status(201).json({ message: 'User created successfully', user: result });
 
        }catch(err){
+        await t.rollback();
          console.error('error while entering user data in table',err);
          return res.status(500).json({ message: 'Internal Server Error', error: err });
        }
@@ -45,7 +48,7 @@ module.exports ={
         if (!email || !password) {
             return res.status(400).json({ message: "All fields required" });
         }
-
+        
         try {
             const user = await User.findOne({ where: { email } });
 

@@ -43,8 +43,16 @@
           <button type="submit">Login</button>
           <br /><br />
           <button type="button"><a href="/auth/signup">SignUp</a></button>
+          <br/><br/>
+          <button type="button" id="forgotPasswordLink">Forget Password</button>
         </form>
       </div>
+      <div class="forgot-container" id="forgotContainer" style="display: none;">
+        <h3>Reset Password</h3>
+        <input type="email" id="email1" placeholder="Enter your email" required>
+        <button onclick="submitForgotPassword()">Submit</button>
+        <p class="message" id="responseMessage"></p>
+    </div>
     </div>
     <script src="/form.js"></script>
   </body>

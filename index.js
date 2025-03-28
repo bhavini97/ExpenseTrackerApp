@@ -6,6 +6,7 @@ const loginSignUpRoutes = require('./routes/loginSignUp');
 const expRouter = require('./routes/expenseRoutes');
 const orderRouter = require('./routes/orderRoutes');
 const leaderboardRouter = require('./routes/leadershipRoutes')
+const forgotpasswordRouter = require('./routes/forgetPassword');
 const {syncDB} = require('./models/centralized');
 
 app.use(cors());
@@ -21,7 +22,7 @@ app.use('/payment',orderRouter);
 
 app.use('/premium',leaderboardRouter);
 
-
+app.use('/password',forgotpasswordRouter);
 
 syncDB().then(() => {
     app.listen(3000, () => console.log('Server running on port 3000'));
