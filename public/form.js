@@ -80,6 +80,7 @@ function submitForgotPassword(){
         })
         .catch(error => {
             messageBox.style.color = "red";
+            messageBox.style.fontWeight ="1000"
             messageBox.innerText = error.response?.data?.message || "Something went wrong!";
         });
 

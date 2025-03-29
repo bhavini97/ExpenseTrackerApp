@@ -22,9 +22,8 @@ module.exports ={
 
         const [result, created] = await User.findOrCreate({ 
             where: { email: email },
-            defaults:{username: username,password:hashedPassword,email:email }
-       },{
-        transaction :t
+            defaults:{username: username,password:hashedPassword,email:email },
+             transaction :t
        });
 
         if(!created){
