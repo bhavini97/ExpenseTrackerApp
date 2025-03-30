@@ -8,6 +8,7 @@ const orderRouter = require('./routes/orderRoutes');
 const leaderboardRouter = require('./routes/leadershipRoutes')
 const forgotpasswordRouter = require('./routes/forgetPassword');
 const {syncDB} = require('./models/centralized');
+const premiumRoutes = require('./routes/premiumTable');
 
 app.use(cors());
 app.use(express.json());
@@ -23,6 +24,8 @@ app.use('/payment',orderRouter);
 app.use('/premium',leaderboardRouter);
 
 app.use('/password',forgotpasswordRouter);
+
+app.use('/expenses', premiumRoutes); 
 
 syncDB().then(() => {
     app.listen(3000, () => console.log('Server running on port 3000'));
