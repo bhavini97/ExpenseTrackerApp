@@ -36,6 +36,7 @@ module.exports = {
     }
   },
 
+  // getting user details to know about its premium status
   getUserDetails: async (req, res) => {
     if (!req.user.userId) {
       return res

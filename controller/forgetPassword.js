@@ -52,6 +52,7 @@ module.exports = {
       },
     ];
 
+    // setting receiver and sender data and content of mail
     await tranEmailApi.sendTransacEmail({
       sender,
       to: receivers,
@@ -75,7 +76,7 @@ module.exports = {
       const resetRequest = await ForgotPasswordRequest.findOne({
         where: { id, isActive: true },
       });
-  
+     // only move forward if token is not expired
       if (!resetRequest) {
         return res.status(400).json({ message: "Invalid or expired link!" });
       }

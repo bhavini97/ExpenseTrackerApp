@@ -22,55 +22,24 @@
 <body>
         <div class="row">
             <div class="col">
-            <select class="form-select" aria-label="Default select example" id="reportType">
-            <option value="Yearly">Yearly</option>
-            <option value="Monthly">Monthly</option>
-            <option value="Weekly">Weekly</option>
-          </select>
-        </div>
-        <div class="col">
-            <button type="button" class="btn btn-dark disabled">Download Expense File</button>
-        </div>
+
+            <button type="button" class="btn btn-dark">Download Expense File</button>
+        
         </div>
     
-    <h2 id="weeklyExpenses" ></h2>
-    <table class="table table-success table-striped" id="weekly" style="display: none;">
+    <h2 id="Expenses" ></h2>
+    <table class="table table-success table-striped" id="tableData" style="display: none;">
         <thead>
             <tr>
               <th scope="col">Date</th>
               <th scope="col">Description</th>
               <th scope="col">Category</th>
-              <th scope="col">Income</th>
               <th scope="col">Expense</th>
             </tr>
           </thead>
           <tbody></tbody>
       </table>
-      <h2 id="monthlyExpense" ></h2>
-      <table class="table table-striped table-hover" id="monthly" style="display: none;">
-        <thead>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Description</th>
-              <th scope="col">Category</th>
-              <th scope="col">Income</th>
-              <th scope="col">Expense</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-      </table>
-      <h2 id="yearlyHeading"></h2>
-      <table class="table table-striped table-hover" id="Yearly" style="display: none;">
-        <thead>
-            <tr>
-              <th scope="col">Month</th>
-              <th scope="col">Income</th>
-              <th scope="col">Expense</th>
-              <th scope="col">Savings</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-      </table>
+      
     </body>
     <script src="./premium.js"></script>
 </html>

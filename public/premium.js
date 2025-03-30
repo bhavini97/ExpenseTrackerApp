@@ -1,33 +1,44 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const reportType = document.getElementById("reportType");
-    const weeklyTable = document.getElementById("weekly");
-    const monthlyTable = document.getElementById("monthly");
-    const yearlyTable = document.getElementById("Yearly");
+    const tableData = document.getElementById("tableData");
+    const heading = document.getElementById("Expenses")
     const paginationControls = document.createElement("div");
 
     let currentPage = 1;
     let totalPages = 1;
-    const limit = 5; // Records per page
-    let selectedFilter = reportType.value;
-
+    
+    
     // Creating pagination buttons
     paginationControls.innerHTML = `
         <button id="prevPage" class="btn btn-secondary m-2" disabled>Previous</button>
+        <select id="pageLimit">
+        <option value ='5'>5</option>
+         <option value ='10'>10</option>
+        <option value ='15'>15</option>
+        </select>
         <span id="pageInfo" class="m-2"></span>
         <button id="nextPage" class="btn btn-secondary m-2">Next</button>
     `;
     document.body.appendChild(paginationControls);
 
+    
+    // Setting dynamic limit
+// Getting stored limit from localStorage, or setting a default value
+let limit = localStorage.getItem('pageLimit') || document.getElementById('pageLimit').value;
+
+// Setting the dropdown to the stored value
+document.getElementById('pageLimit').value = limit;
+
+document.getElementById('pageLimit').addEventListener('change', () => {
+    limit = document.getElementById('pageLimit').value; // Update limit
+    localStorage.setItem('pageLimit', String(limit)); // Storing updated limit
+    fetchExpenses(); 
+});
+
     const prevPageBtn = document.getElementById("prevPage");
     const nextPageBtn = document.getElementById("nextPage");
     const pageInfo = document.getElementById("pageInfo");
 
-    reportType.addEventListener("change", () => {
-        selectedFilter = reportType.value;
-        currentPage = 1;
-        fetchExpenses();
-    });
-
+    // when the page btn is clicked it update the current page value
     prevPageBtn.addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
@@ -42,13 +53,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // fetching expense of a paricular user and displaying it(only for premium)
     async function fetchExpenses() {
         try {
-            const response = await fetch(`http://localhost:3000/expenses?filter=${selectedFilter}&page=${currentPage}&limit=${limit}`);
+            const response = await fetch(`http://localhost:3000/table/expenses?page=${currentPage}&limit=${limit}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+              });
             const data = await response.json();
 
             totalPages = data.totalPages;
-            displayExpenses(data.expenses, selectedFilter);
+            displayExpenses(data.expenses);
 
             // Update pagination buttons
             pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
@@ -59,24 +73,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function displayExpenses(expenses, filter) {
-        weeklyTable.style.display = "none";
-        monthlyTable.style.display = "none";
-        yearlyTable.style.display = "none";
+    // displaying expense in table(for premium user)
+    function displayExpenses(expenses) {
+        tableData.style.display = "block";
 
-        let table;
-        let tbody;
+        let table = tableData;
+        let tbody = table.querySelector("tbody");
 
-        if (filter === "Weekly") {
-            table = weeklyTable;
-            tbody = table.querySelector("tbody");
-        } else if (filter === "Monthly") {
-            table = monthlyTable;
-            tbody = table.querySelector("tbody");
-        } else if (filter === "Yearly") {
-            table = yearlyTable;
-            tbody = table.querySelector("tbody");
+        if(heading.style.display == 'none'){
+            heading.style.display = 'block'
         }
+
+        heading.textContent = `Your Expense Table`;
 
         if (!table || !tbody) return;
 
@@ -84,22 +92,15 @@ document.addEventListener("DOMContentLoaded", () => {
         expenses.forEach(expense => {
             const row = document.createElement("tr");
 
-            if (filter === "Yearly") {
+           
+        
                 row.innerHTML = `
-                    <td>${expense.month}</td>
-                    <td>${expense.totalIncome}</td>
-                    <td>${expense.totalExpense}</td>
-                    <td>${expense.savings}</td>
-                `;
-            } else {
-                row.innerHTML = `
-                    <td>${new Date(expense.date).toLocaleDateString()}</td>
+                    <td>${new Date(expense.createdAt).toLocaleDateString()}</td>
                     <td>${expense.description}</td>
                     <td>${expense.category}</td>
-                    <td>${expense.income || '-'}</td>
-                    <td>${expense.expense || '-'}</td>
+                    <td>${expense.amount || '-'}</td>
                 `;
-            }
+            
 
             tbody.appendChild(row);
         });

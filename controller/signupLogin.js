@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const SECRET_KEY = process.env.JWT_SECRET_KEY 
 
 module.exports ={
+
+    // add new user detail in user table
     addUser :async(req,res)=>{
        const username = req.body.username;
        const email = req.body.email;
@@ -15,11 +17,13 @@ module.exports ={
     }
        const t = await db.transaction();
        try{
+        // encrypting the passworg using bcrypt
         const hashedPassword = await bcrypt.hash(password, 10).catch(err => {
             console.error('Error hashing password:', err);
             return  res.status(501).json({ message: 'error hashing password' })
         });
 
+        // create user only if its email id doesn't exist in database
         const [result, created] = await User.findOrCreate({ 
             where: { email: email },
             defaults:{username: username,password:hashedPassword,email:email },
@@ -30,6 +34,7 @@ module.exports ={
             return  res.status(400).json({ message: 'User already exists with the same email' });
         }
 
+        // commit the changes
         await t.commit();
         return res.status(201).json({ message: 'User created successfully', user: result });
 
@@ -54,6 +59,8 @@ module.exports ={
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
+
+            // match the encrypted password stored in db with entered password
             
             const matchPassword = await bcrypt.compare(password, user.password).catch(err => {
                 console.error('Error comparing hash password:', err);

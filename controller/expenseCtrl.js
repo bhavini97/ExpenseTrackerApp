@@ -1,5 +1,7 @@
 const { User, Expense, db } = require("../models/centralized");
 module.exports = {
+
+  //insert expense data to expense table
   postExpense: async (req, res) => {
     console.log(req.body);
     const { amount, category, description } = req.body;
@@ -27,7 +29,7 @@ module.exports = {
       if (!result) {
         return res.status(400).json({ message: "error while adding expense", err });
       }
-
+// increment expense in userId
       const addExpenseToUser = await User.increment(
         { totalExpense: amount }, 
         {
@@ -39,6 +41,7 @@ module.exports = {
        // Commit transaction (only if both operations succeed)
           await t.commit();
 
+        // find the updates user and sending data to frontend
         const updatedUser = await User.findOne({
           where: { id: userId },
           attributes: ["id", "totalExpense"],
@@ -55,6 +58,7 @@ module.exports = {
     }
   },
 
+  // getting expense from expense table
   getExpense: async (req, res) => {
     try {
       console.log(req.user);
@@ -85,14 +89,19 @@ module.exports = {
           await t.rollback()
             return res.status(404).json({ message: "Expense not found" });
         }
+
        // console.log(expense);
       const deletedRows = await Expense.destroy({ where: { id: id } },{transaction : t});
+
+      // if there ate any deleted rows then delete expense from total expense from user table
       if (deletedRows > 0) {
         await User.update(
           { totalExpense: db.literal(`totalExpense - ${expense.amount}`) },
           { where: { id: expense.userId } },
           {transaction : t}
         );
+        
+        //only commit when both transaction are successful
        await t.commit();
         return res.status(200).json({ message: "Expense deleted successfully" });
 

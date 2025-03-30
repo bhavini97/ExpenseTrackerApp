@@ -3,6 +3,8 @@ const {Order,User,db} = require('../models/centralized');
 const cashfreeService = require('../Service/cashfreeService');
 
 module.exports = {
+
+    //giving payment order to cashfree service
     postPaymentOrder : async(req,res)=>{
         const userId = req.user.userId;
         
@@ -13,6 +15,7 @@ module.exports = {
 
         const orderId = `ORDER_${Date.now()}`; // Generate unique order ID
 
+        // getting service id from cashfree services file
         try{
             const paymentSessionId = await cashfreeService.createOrder(orderId,userId);
             console.log(paymentSessionId)
@@ -40,6 +43,7 @@ module.exports = {
 
         const t = await db.transaction()
         try{
+            // fetching order status from cashfree service
             const order_status = await cashfreeService.getPaymentStatus(orderId);
             console.log(order_status)
             if(!order_status){
@@ -52,6 +56,7 @@ module.exports = {
                 if (!order) {
                     return res.status(404).json({ message: "Order not found" });
                 }
+                // update premium status of the user only if order is successful
                 if (order_status === "SUCCESS") {
                     await User.update({ isPremium: true }, { where: { id: order.user_id } },{
                         transaction : t
@@ -59,10 +64,12 @@ module.exports = {
 
                     console.log(`User ${order.user_id} is now premium`);
                 }
+                // update order status in order table
                 const [result] = await Order.update({status:order_status},{where:{order_id:orderId}},{
                     transaction : t
                 });
                  
+                // only commit changes when all the transaction are successful
                 await t.commit();
                 if(result >0){
                     console.log('order status updated successfully')

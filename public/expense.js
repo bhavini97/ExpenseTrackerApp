@@ -2,6 +2,7 @@ const ul = document.querySelector("#expList");
 const token = localStorage.getItem("token");
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    // checking if the user is premium or not
     if (token) {
       const response = await fetch(
         "http://localhost:3000/premium/auth/user-details",
@@ -14,6 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.log(data);
       if (data.isPremium) {
         document.getElementById("leaderboardBtn").style.display = "block";
+        document.getElementById('premiumFeature').style.display = "block";
       }
 
       fetchDetails();
@@ -37,7 +39,7 @@ function fetchDetails() {
         const str = `${element.amount} - ${element.category} - ${element.description} `;
         li.append(str);
 
-        //del
+        //delete button in list
         const delBtn = document.createElement("button");
         delBtn.textContent = "Delete";
         delBtn.className = "btn btn-danger btn-sm ms-2";
@@ -75,7 +77,7 @@ function postExpense(event) {
       },
     })
     .then((res) => {
-      document.querySelector("#expense").reset();
+      document.querySelector("#expense").reset(); // reset form
       fetchDetails();
     })
     .catch((err) => {
@@ -97,7 +99,7 @@ function deleteElement(id, token) {
     });
 }
 
-// to show leaderboard
+// to show leaderboard data for premium users only 
 document.getElementById("leaderboardBtn").addEventListener("click", async () => {
     try {
       const response = await fetch(
@@ -122,3 +124,5 @@ document.getElementById("leaderboardBtn").addEventListener("click", async () => 
       console.error("error getting leadership data");
     }
   });
+
+  

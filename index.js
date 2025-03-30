@@ -25,7 +25,7 @@ app.use('/premium',leaderboardRouter);
 
 app.use('/password',forgotpasswordRouter);
 
-app.use('/expenses', premiumRoutes); 
+app.use('/table', premiumRoutes); 
 
 syncDB().then(() => {
     app.listen(3000, () => console.log('Server running on port 3000'));
