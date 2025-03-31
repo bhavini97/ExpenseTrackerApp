@@ -56,7 +56,7 @@ document.getElementById('pageLimit').addEventListener('change', () => {
     // fetching expense of a paricular user and displaying it(only for premium)
     async function fetchExpenses() {
         try {
-            const response = await fetch(`http://localhost:3000/table/expenses?page=${currentPage}&limit=${limit}`, {
+            const response = await fetch(`http://localhost:3000/premium/expenses?page=${currentPage}&limit=${limit}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
               });
             const data = await response.json();
@@ -109,4 +109,59 @@ document.getElementById('pageLimit').addEventListener('change', () => {
     }
 
     fetchExpenses(); // Initial call
+    document.getElementById('fileDownloadBtn').addEventListener('click',async()=>{
+    try{
+        const response = await fetch(`http://localhost:3000/expense/download`,{
+            headers : {Authorization: `Bearer ${localStorage.getItem("token")}` },
+        })
+        console.log(response)
+        if(response.status === 200){
+            // backend is sending the download link
+            // which gets automatically downloaded when clicked
+            const data = await response.json();
+      const a = document.createElement('a');
+      a.href = data.fileUrl;
+      a.download = 'myExpense.csv';
+     
+    
+            a.click();
+        }else{
+            throw new Error(response.data.message)
+        }
+        console.log('download button clicked')
+    }catch(err){
+        console.error('socmething went wrong when clicked on download button');
+    }
+    })
+
+    const fileDownloadList = document.getElementById("fileDownloadList");
+
+    async function fetchDownloadedFiles() {
+        try {
+            const response = await fetch("http://localhost:3000/premium/downloads", {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+            });
+            const data = await response.json();
+            console.log("Fetched Data: ", data);  // Log the data
+            displayDownloadedFiles(data.downloads);
+        } catch (err) {
+            console.error("Error fetching downloaded files:", err);
+        }
+    }
+    
+    function displayDownloadedFiles(files) {
+        const fileDownloadList = document.getElementById("fileDownloadList");
+        fileDownloadList.innerHTML = ""; // Clear existing list items
+    
+        // Iterate over each file in the files array
+        files.forEach(file => {
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="${file.fileUrl}" target="_blank" style="color:black">${new Date(file.downloadedAt).toLocaleString()} - ${file.fileUrl}</a>`;
+            fileDownloadList.appendChild(li);
+        });
+    }
+    
+
+    fetchDownloadedFiles();
 });
+

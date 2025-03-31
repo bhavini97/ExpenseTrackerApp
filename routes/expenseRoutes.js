@@ -12,5 +12,7 @@ router.post('/add-expense',authMiddleware,expCtrl.postExpense);
 router.get('/get-expense',authMiddleware,expCtrl.getExpense)
 router.delete('/delete/:id',authMiddleware,expCtrl.deleteExp);
 
+router.get('/download',authMiddleware,expCtrl.downloadExp);
+
 
 module.exports = router;

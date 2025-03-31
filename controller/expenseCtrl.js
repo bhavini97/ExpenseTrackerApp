@@ -1,116 +1,63 @@
-const { User, Expense, db } = require("../models/centralized");
+const uploadToS3 = require("../Service/S3service")
+const AWS = require('aws-sdk')
+const { addExpense, getExpenses, deleteExpense } = require("../Service/expenseService");
+const FileDownload = require('../models/fileDownload');
+
 module.exports = {
 
   //insert expense data to expense table
   postExpense: async (req, res) => {
-    console.log(req.body);
-    const { amount, category, description } = req.body;
-    
-    const userId = req.user.userId; // Extract userId from JWT
-    const t = await db.transaction();
-
-    if (!req.user || !req.user.userId) {
-      return res.status(401).json({ message: "Unauthorized: User ID missing" });
-    }
-    if (!amount || !category || !description) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
     try {
-      const result = await Expense.create({
-        amount: amount,
-        category: category,
-        description: description,
-        userId: userId,
-      },{
-        transaction :t
-      });
-
-      if (!result) {
-        return res.status(400).json({ message: "error while adding expense", err });
-      }
-// increment expense in userId
-      const addExpenseToUser = await User.increment(
-        { totalExpense: amount }, 
-        {
-          where: { id: userId },
-          transaction: t, 
-        }
-      );
-        console.log('in post expense',addExpenseToUser)
-       // Commit transaction (only if both operations succeed)
-          await t.commit();
-
-        // find the updates user and sending data to frontend
-        const updatedUser = await User.findOne({
-          where: { id: userId },
-          attributes: ["id", "totalExpense"],
-        });
-        console.log('updates expense',updatedUser.totalExpense)
-
-      return res.status(200).json({  message: "expense added successfully",result,totalExpense: updatedUser.totalExpense});
+      const { amount, category, description } = req.body;
+      if (!amount || !category || !description) return res.status(400).json({ message: "All fields are required" });
+      // calling add expense from service
+      const result = await addExpense(req.user.userId, amount, category, description);
+      return res.status(200).json({ message: "Expense added successfully", result });
     } catch (err) {
-      await t.rollback()
-      console.error("something went wrong when adding expense", err);
-      return res
-        .status(400)
-        .json({ message: "error while adding expense", err });
+      return res.status(400).json({ message: err.message });
     }
   },
 
   // getting expense from expense table
   getExpense: async (req, res) => {
     try {
-      console.log(req.user);
-      const userId = req.user.userId; // Extracted from JWT that is send from jwt.js
-
-      if (!req.user || !req.user.userId) {
-        return res
-          .status(401)
-          .json({ message: "Unauthorized: User ID missing" });
-      }
-
-      const expenses = await Expense.findAll({ where: { userId: userId } });
+      const expenses = await getExpenses(req.user.userId);
       return res.status(200).json(expenses);
     } catch (err) {
-      console.error("Error fetching expenses:", err);
-      return res.status(500).json({ message: "Error fetching expenses", err });
+      return res.status(500).json({ message: err.message });
     }
   },
 
   deleteExp: async (req, res) => {
-    const id = req.params.id;
-    
-    const t = await db.transaction();
     try {
-      
-      const expense = await Expense.findByPk(id,{transaction :t});
-        if (!expense) {
-          await t.rollback()
-            return res.status(404).json({ message: "Expense not found" });
-        }
+      const success = await deleteExpense(req.params.id);
+      if (!success) return res.status(404).json({ message: "Expense not found" });
+      return res.status(200).json({ message: "Expense deleted successfully" });
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  },
 
-       // console.log(expense);
-      const deletedRows = await Expense.destroy({ where: { id: id } },{transaction : t});
+  // download expense file
+  downloadExp: async(req,res)=>{
+    try {
+      const expenses = await getExpenses(req.user.userId);
+      // constructing filename with userid and date to make it unique
+      const fileName = `Expenses${req.user.userId}/${new Date().toISOString()}.txt`;
+      const fileUrl = await uploadToS3(JSON.stringify(expenses), fileName);
 
-      // if there ate any deleted rows then delete expense from total expense from user table
-      if (deletedRows > 0) {
-        await User.update(
-          { totalExpense: db.literal(`totalExpense - ${expense.amount}`) },
-          { where: { id: expense.userId } },
-          {transaction : t}
-        );
-        
-        //only commit when both transaction are successful
-       await t.commit();
-        return res.status(200).json({ message: "Expense deleted successfully" });
-
-      } else {
-        res.status(404).json({ message: "Expense not found" });
+      try{
+        await FileDownload.create({
+          userId: req.user.userId,
+          fileUrl: fileUrl,
+          downloadedAt: new Date(),
+        });
+      }catch(err){
+          throw new Error('file url cannot inserted')
       }
-    } catch (error) {
-     await t.rollback();
-      res.status(500).json({ message: "Error deleting expense", error });
+      return res.status(200).json({ fileUrl, SUCCESS: true });
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
     }
   },
 };
