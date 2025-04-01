@@ -56,7 +56,7 @@ document.getElementById('pageLimit').addEventListener('change', () => {
     // fetching expense of a paricular user and displaying it(only for premium)
     async function fetchExpenses() {
         try {
-            const response = await fetch(`http://localhost:3000/premium/expenses?page=${currentPage}&limit=${limit}`, {
+            const response = await fetch(`http://3.110.219.92/premium/expenses?page=${currentPage}&limit=${limit}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
               });
             const data = await response.json();
@@ -111,7 +111,7 @@ document.getElementById('pageLimit').addEventListener('change', () => {
     fetchExpenses(); // Initial call
     document.getElementById('fileDownloadBtn').addEventListener('click',async()=>{
     try{
-        const response = await fetch(`http://localhost:3000/expense/download`,{
+        const response = await fetch(`http://3.110.219.92/expense/download`,{
             headers : {Authorization: `Bearer ${localStorage.getItem("token")}` },
         })
         console.log(response)
@@ -138,7 +138,7 @@ document.getElementById('pageLimit').addEventListener('change', () => {
 
     async function fetchDownloadedFiles() {
         try {
-            const response = await fetch("http://localhost:3000/premium/downloads", {
+            const response = await fetch("http://3.110.219.92/premium/downloads", {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             const data = await response.json();

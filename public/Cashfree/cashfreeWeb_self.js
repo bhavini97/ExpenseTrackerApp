@@ -14,7 +14,7 @@ document.getElementById("renderBtn").addEventListener("click", async() => {
     
     // fetch session id from backend
     try{
-       const response = await fetch('http://localhost:3000/payment/pay',{
+       const response = await fetch('http://3.110.219.92/payment/pay',{
         method:"POST",
         headers: {
             "Content-Type": "application/json",
@@ -43,7 +43,7 @@ document.getElementById("renderBtn").addEventListener("click", async() => {
         
     }, 500);
 
-       const res = await fetch(`http://localhost:3000/payment/payment-status/${orderId}`,{
+       const res = await fetch(`http://3.110.219.92/payment/payment-status/${orderId}`,{
         method :"GET",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`, // Include token

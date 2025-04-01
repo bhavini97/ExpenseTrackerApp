@@ -34,7 +34,7 @@ async function sendResetEmail(email) {
       sender,
       to: receivers,
       subject: "Password Reset Request",
-      textContent: `Click the link to reset your password: http://localhost:3000/password/resetpassword/${resetId}`,
+      textContent: `Click the link to reset your password: http://3.110.219.92/password/resetpassword/${resetId}`,
     });
   
     return { message: "Reset email sent successfully!" };

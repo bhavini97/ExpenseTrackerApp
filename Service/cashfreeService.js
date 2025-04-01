@@ -26,7 +26,7 @@ exports.createOrder = async(
                 "customer_phone": "8474090589"
             },
             "order_meta": {
-        "return_url": `http://localhost:3000/payment/payment-status/${orderId}`,
+        "return_url": `http://3.110.219.92/payment/payment-status/${orderId}`,
         "payment_methods": "cc,dc,upi"
         },
             "order_expiry_time": formattedExpiryDate

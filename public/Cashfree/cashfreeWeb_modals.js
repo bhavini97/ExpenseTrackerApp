@@ -16,7 +16,7 @@ document.getElementById("renderBtn").addEventListener("click", async(event) => {
 
     // fetch session id from backend
     try{
-       const response = await fetch('http://localhost:3000/payment/pay',{
+       const response = await fetch('http://3.110.219.92/payment/pay',{
         method:"POST",
         headers: {
             "Content-Type": "application/json",
@@ -52,7 +52,7 @@ document.getElementById("renderBtn").addEventListener("click", async(event) => {
 
        if(result.paymentDetails){
         console.log(result.paymentDetails.paymentMessage)
-        const response = await fetch(`http://localhost:3000/payment/payment-status/${orderId}`,{
+        const response = await fetch(`http://3.110.219.92/payment/payment-status/${orderId}`,{
             method :"GET",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`, // Include token
@@ -63,7 +63,7 @@ document.getElementById("renderBtn").addEventListener("click", async(event) => {
         const data = await response.json()
         console.log(data)
         alert("your payment is "+data.orderStatus)
-        window.location.href = "http://localhost:3000/expense/add-expense";
+        window.location.href = "http://3.110.219.92/expense/add-expense";
        }
     }catch(err){
       console.log('error ',err.message)
