@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // checking if the user is premium or not
     if (token) {
       const response = await fetch(
-        "http://localhost:3000/premium/auth/user-details",
+        "http://3.110.219.92//premium/auth/user-details",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 function fetchDetails() {
   axios
-    .get(`http://localhost:3000/expense/get-expense`, {
+    .get(`http://3.110.219.92/expense/get-expense`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((res) => {
@@ -71,7 +71,7 @@ function postExpense(event) {
   };
 
   axios
-    .post(`http://localhost:3000/expense/add-expense`, expenseData, {
+    .post(`http://3.110.219.92/expense/add-expense`, expenseData, {
       headers: {
         Authorization: `Bearer ${token}`, // sending token to backend from localstorage
       },
@@ -87,7 +87,7 @@ function postExpense(event) {
 
 function deleteElement(id, token) {
   axios
-    .delete(`http://localhost:3000/expense/delete/${id}`, {
+    .delete(`http://3.110.219.92/expense/delete/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((res) => {
@@ -103,7 +103,7 @@ function deleteElement(id, token) {
 document.getElementById("leaderboardBtn").addEventListener("click", async () => {
     try {
       const response = await fetch(
-        "http://localhost:3000/premium/leaderboard",
+        "http://3.110.219.92/premium/leaderboard",
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }

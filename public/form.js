@@ -4,7 +4,7 @@ function postForm(event){
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-     axios.post(`http://localhost:3000/auth/user/signup`,{
+     axios.post(`http://3.110.219.92/auth/user/signup`,{
         username : name,
         email : email,
         password : password
@@ -29,7 +29,7 @@ function getForm(event){
    const name = event.target.name.value;
    const email =  event.target.email.value;
    const password = event.target.password.value;
-    axios.post(`http://localhost:3000/auth/user/login`,{
+    axios.post(`http://3.110.219.92/auth/user/login`,{
 
          email: email,
          password: password
@@ -73,7 +73,7 @@ function submitForgotPassword(){
         return;
     }
 
-    axios.post("http://localhost:3000/password/forgotpassword", { email })
+    axios.post("http://3.110.219.92/password/forgotpassword", { email })
         .then(response => {
             messageBox.style.color = "green";
             messageBox.innerText = response.data.message || "Email sent! Check your inbox.";
